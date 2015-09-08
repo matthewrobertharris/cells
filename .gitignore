@@ -1,0 +1,8 @@
+*~
+*.pyc
+*.csv
+*.cfg
+.*.swp
+*.c
+*.so
+build
