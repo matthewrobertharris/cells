@@ -471,6 +471,7 @@ ACT_SPAWN, ACT_MOVE, ACT_EAT, ACT_RELEASE, ACT_ATTACK, ACT_LIFT, ACT_DROP = rang
 
 ACTIONS = ["ACT_SPAWN", "ACT_MOVE", "ACT_EAT", "ACT_RELEASE", "ACT_ATTACK", "ACT_LIFT", "ACT_DROP"]
 
+
 class Action(object):
     # A class for passing an action around.
     def __init__(self, action_type, data=None):
@@ -482,6 +483,7 @@ class Action(object):
 
     def get_type(self):
         return self.type
+
 
 class WorldView(object):
     def __init__(self, me, agent_views, plant_views, terr_map, energy_map):

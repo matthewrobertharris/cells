@@ -3,6 +3,7 @@ import random
 
 import cells
 from harris.helpers import Helper
+from harris.AStar import SquareGrid, AStar
 
 __author__ = 'matthew harris'
 
@@ -36,8 +37,9 @@ class AgentMind(object):
             debug = "eat1"
             action = cells.ACT_EAT
         elif hungry:
-            (dx, dy) = helper.dir_to(pos, self.my_plant.get_pos())
-            pos = (mx + dx, my + dy)
+            (dx, dy) = AStar.a_star_search(pos, self.my_plant.get_pos(), SquareGrid(view.get_terr(), me.loaded))[1]
+            #(dx, dy) = helper.dir_to(pos, self.my_plant.get_pos())
+            pos = (dx, dy)
             debug = "move1"
             action = cells.ACT_MOVE
             while not helper.can_move(view, pos):
@@ -95,7 +97,19 @@ class AgentMind(object):
         print(helper.display(view, action, pos, self))
         print(debug)
 
+        print(self.test_astar(view))
+
         return cells.Action(action, pos)
+
+    def test_astar(self, view):
+        me = view.get_me()
+        graph = SquareGrid(view.get_terr(), me.loaded)
+        me_pos = me.get_pos()
+        plant_pos = (random.randrange(0, graph.width), random.randrange(0, graph.height))
+        if self.my_plant:
+            plant_pos = self.my_plant.get_pos()
+
+        print(AStar.a_star_search(me_pos, plant_pos, graph))
 
     def get_plant(self, view):
         # Attach to the strongest plant found.
