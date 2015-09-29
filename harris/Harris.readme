@@ -1,0 +1,100 @@
+Concept:
+
+    The idea behind this mind is to create 'bases' around each plant, from which a colony can be sustained.  This mind's goal is to outlive any other mind by controlling the resources of the map, thereby starving the enemy out.
+
+    To make sure that this is achievable, within the rules of the game, there is a clear weakness in this approach - the time that it takes to prepare such a defense.  This is, at the beginning of the game, a mind that simply multiplies as quickly as possible could overwhelm this mind.  Specific steps must be taken to counter that.  These are known as 'Phases'.  These phases, and their goals, are discussed later.  The phases are basically controlled by a set of rules which dictate the distribution of roles across the mind.  For instance, in a 'build' phase, there is likely to be more agents taking on the 'builder' role.  In the 'seige' phase, these same 'builders' may become 'defenders'.  To determine what phase one should be in takes a certain criteria, and then once the phase is defined, each agent can make a decision, based on the distribution of the other agents, on what role it should fulfill.  Since each agent's behaviour is evaluated sequentially, this simplifies the decision making process.
+
+    To achieve the goals of each phase, different roles must be employed.  These roles, and how they fulfill objectives, are discussed later.
+
+    To the mind there are definite risks.  These risks are discussed, and potential mitigaters discussed later.
+
+    To achieve all the decision making that is necessary for changing phases and changing roles, key information must be accessible to each agent.  There are 2 types of information here - global and local.  The local information is information that pertains to a single agent for it's decision making, and has very little bearing on any allied agent (such as its home plant, energy and action).  Global information, on the other hand, is shared between all agents, and is key in changing phases and roles of agents.  It includes things such as total mind energy, number of plants controlled, build level of plant defenses, location of enemies, distribution of roles.  These can be shared over the global message channel.
+
+Risks
+
+    Fast Spawning Mind
+        The most real risk to this mind is another mind that is simply all out aggressive.  This type of mind is one that uses up the non-renewable resources on the map to very quickly reproduce and produce a formidable army.  The risk is that this occurs faster than any defense can be built up.  To combat this, the mind should simply employ the same strategy - absorb as much of the non-renewable energy as quickly as possible.  The trade off will be to also build defenses around the renewable energy, so that in the long term, this enemy mind cannot sustain itself.
+
+    Highly defensive Mind
+        With this mind being so focused on defense, there is the possibility that you come up against another highly defensive mind - the unstoppable force and immovable object.  Or basically 2 minds that are so insular that neither can win, but neither can lose.  To combat this, the mind must have some knowledge of aggression, or attacking, and not be completely defensive.
+
+Information:
+
+    Total number agents
+        The total number of agents in the mind.  This may be difficult to calculate, depending on whether agents can do anything on death.
+
+    Total mind energy
+        The total energy of all agents in the mind.  To store this, it is likely that each agent is simply given a unique ID on spawn and then there is a map that stores it's energy.  The total is then the sum of the map
+
+    Plant locations
+        Again, a map of all the plant locations.  This may need to include whether that plant is maintained, completely defended, under attack, etc.
+
+    Distribution of roles
+        A list of the roles in the mind and the number of agents that fulfill that role.  For each phase there will be a pre-set distribution that the phase should be aiming towards.  This can, potentially, be gained experimentally.  To achieve this distribution, there will be some random factor, so that agents don't automatically change, but gradually change over time.
+
+    Location of enemies
+        This is likely to be a 2 dimensional boolean array, simply saying if there is an enemy in a location.  It may end up becoming an integer array to story the locations of plants and allies,  Couple this with the terrain and you would get an overview of the entire map.  Note that this would have to be updated with the most up to date information and may, indeed, contain old and out of date data.
+
+    Location of allies
+        The array of integers to store all positions looks the most likely.  The location should just be the ID (integer) of the team the agent belongs to.  Since agents and plants can occupy the same level, you can simply negate the mind's team id to store if an agent and a plant are on the same location.
+
+    Location age
+        Another metric would be the age of data at various locations.  This would simply be an array that stores the current turn when an agent visits that location (and adjacent locations).  In this way, you could put a heap over this map to bring in out smallest number, which is the best place to explore.  This could also be fed into the A* algorithm to make sure that older paths are visited over newer paths.
+
+Phases:
+
+    Populate
+        The distinction between 'populate' and 'gather' is subtle, yet both must work together to achieve the mind's goals.  Populate simply means to create more agents, which in turn can, potentially, absorb more non-renewable energy.  It is clear that you can't gather without a populate phase.  However, the populate phase can also be used to raise an army or even increase the population to the maximum supported by the controlled plants.
+
+    Gather
+        At any point in the game, especially in the beginning phases though, the agents must absorb all the energy that is physically possible.  The reason for this is, primarily, because it is the cheapest way to get energy.  Secondly, and potentially more importantly, is that it keeps that energy away from the enemy.  This is important, since the focus of this mind is to control the renewable energy sources, and so starve the enemy out.
+        There is some debate that the 'gather' phase should include some rapid expansion phase, to get as much of the energy as possible.  This would be in addition to the rule that each agent should consume as much non-renewable energy as possible.
+
+    Build
+        A defensive position can be built, using the terrain, around plants.
+        This defensive position will get to a stage where there is no more improvement necessary, or at least there is only minor upkeep neccessary (for instance, in the event of a seige).  For this reason, the build phase has a definite life span.
+
+    Explore
+        Throughout the course of the game, the mind must explore the map.  It must do this to find new plants, to absorb non-renewable energy and ultimately, find and eliminate the enemy.  These sub-phases may dictate how the exploration is carried out, although there is also the option that explorer's can make informed decisions on exploring based on the aggregate information contained in the mind (for instance, binary searching around plants and other agents).
+
+    Aggressive
+        At some point the mind must attack the enemy.  It doesn't appear to be sufficient to simply ride out the game and wait for the enemy to starve to death (see defensive risk).  In this way, there need to be mechanisms to be able to search and destroy the enemy.  Or at the very least, search for plants and gain control over them.
+        An advanced behaviour that will need to be taken into consideration, specifically around the 'aggressive' phase, is to overcome terrain obstacles.  There are reasons why this could be the case, but the primary two are to reach potentially locked resources and to counter the defensive positions that other minds may produce.  When executing this manouver, one must be careful not to destroy any of its mind's defensive structures.
+
+    Siege
+        It is likely that another mind will eventually try and take or attack this mind and the plants it controls.  Since there is likely to be defensive positions around it, we can call this a siege.  In this phase the idea is to defend the plant and maintain the defenses.  This will mean occupying the higher ground gives a significant advantage.
+
+Roles:
+
+    Builder
+        Responsible for building and then maintaining the plant defenses.  This role has been developed already and works fairly well.  It is possible that using the terrain map, a plan or algorithm can be put in place to find what the optimum shape is for the defenses, and then this be built.  Currently, it applies some rudimentary rules which produce fairly good results.  However, these rules rely on the terrain having certain properties, whereas a smarter algorithm should tailor the defense to the terrain.
+
+    Spawner
+        Using the amount of energy, number of agents and current phase, a spawner is able to produce more agents.  The spawner is likely to be a role shared by agents that are also builders, or at least close to a plant, as the new agents will be more vulnerable than their existing counterparts.  It is also the location in which it is likely that new agents will be needed (in the event of a siege).
+
+    Scout
+        Simply explore the map.  They may employ some smarts as to which areas of the map to explore (for instance, parts that have not been explored yet, or not explored in the longest time).  Scouts are likely to change their role frequently based on what they find (e.g. enemies or plants).
+
+    Defender
+        A defender simply guards a plant when it is under siege.  The height difference between the defenses means that they get an additional combat advantage.  Also, having the plant behind them allows them to maintain some supply lines (via the 'supplier' role).  A defender will most likely attack any enemy over which they have a combat advantage, but may defend if the lines are broken.
+
+    Attacker
+        An attacker is slightly different to the defender.  The defender has some knowledge over their base and can rely on suppliers to supply energy to them - they can then focus on maintaining the higher ground and attacking intruders.  Attackers, on the other hand, do not have these luxuries.  They must be prepared for anything - to gather their own energy, change to a sapper, or retreat.  They may even have to change to a spawner to reinforce the troops
+
+    Sapper
+        The job of a sapper is to simply flatten all the terrain, except those around plants that are in its control.  This means that there is some mechanism to dismantle any enemy structures that they may have.  It is unknown whether this will be a feasible strategy or not, but one that must be investigated none the less.
+
+    Gatherer
+        The role of a gather is similar to that of a scout, except their primary role is to absorb as much energy as possible.  This is so the enemy doesn't take it, but also so it can be taken back to base and deposited so that there is less reliance on the plants.
+
+    Supplier
+        The supplier's role is only activated in the event of a enemy contact, be that siege or attack.  It's role is to take energy to attackers and defenders so that they can stay in the fight for as long as possible.  Primarily, they will only operate within the base, supplying defenders, but at a later date they may supply attacks as well.
+
+
+Tools:
+
+    Pathfinding:
+        A* algorithm for path finding
+
+
+
